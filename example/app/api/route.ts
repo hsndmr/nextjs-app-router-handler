@@ -33,7 +33,7 @@ const GET = new Handler()
   .useAfterHandlers(() => {
     console.log('after handler');
   })
-  .handle(context => {
+  .handle(() => {
     return {
       message: 'Hello World',
     };
