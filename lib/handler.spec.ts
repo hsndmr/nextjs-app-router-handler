@@ -277,7 +277,7 @@ describe('Handler', () => {
       const middleware2 = jest.fn(() => Promise.resolve());
       const guard1 = jest.fn().mockReturnValue(true);
       const guard2 = jest.fn(() => Promise.resolve(true));
-      const handlerFunction = jest.fn(context => Promise.resolve());
+      const handlerFunction = jest.fn(_ => Promise.resolve());
 
       const handler = new Handler()
         .useMiddlewares(middleware1, middleware2)
@@ -396,7 +396,7 @@ describe('Handler', () => {
       const beforeHandler = jest.fn();
       const middleware = jest.fn();
       const guard1 = jest.fn().mockReturnValue(true);
-      const guard2Handler = jest.fn(context => Promise.reject('error'));
+      const guard2Handler = jest.fn(_ => Promise.reject('error'));
       const guard2 = async (context: any) => {
         await guard2Handler(context);
         return true;
@@ -503,7 +503,6 @@ describe('Handler', () => {
 
     it('should handle the request correctly when isRequestJson is set to false', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
       const handlerFunction = () => {
         return NextResponse.json({
           data: 'data',
@@ -522,7 +521,6 @@ describe('Handler', () => {
 
     it('should handle the request correctly when a middleware returns a value', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
       const middleware = () => {
         return NextResponse.json({
           data: 'data',
