@@ -18,10 +18,11 @@ describe('validationPipe', () => {
 
     const contextMock = {
       req: {
-        body: {
-          email: 'test@example.com',
-          name: 'John Doe',
-        },
+        json: () =>
+          Promise.resolve({
+            email: 'test@example.com',
+            name: 'John Doe',
+          }),
       },
       setBody: setBodyMock,
     };
@@ -40,7 +41,7 @@ describe('validationPipe', () => {
     // Arrange
     const contextMock = {
       req: {
-        body: {},
+        json: () => Promise.resolve({}),
       },
     };
 
@@ -59,7 +60,7 @@ describe('validationPipe', () => {
   it('should handle empty request body', async () => {
     const contextMock = {
       req: {
-        body: null,
+        json: () => Promise.resolve(null),
       },
     };
 
@@ -71,7 +72,7 @@ describe('validationPipe', () => {
   it('should handle undefined request body', async () => {
     const contextMock = {
       req: {
-        body: undefined,
+        json: () => Promise.resolve(undefined),
       },
     };
 

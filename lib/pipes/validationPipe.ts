@@ -85,7 +85,8 @@ export const validationPipe = (
   options?: ValidationOptions,
 ) => {
   return async (ctx: Context) => {
-    const validatedBody = await validateObject(cls, ctx.req.body, options);
+    const body = await ctx.req.json();
+    const validatedBody = await validateObject(cls, body, options);
     ctx.setBody(validatedBody);
   };
 };
