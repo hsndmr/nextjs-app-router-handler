@@ -21,8 +21,6 @@ export class Handler<C extends Context> {
 
   private statusCode: HttpStatusCode = HttpStatusCode.OK;
 
-  constructor() {}
-
   status(statusCode: HttpStatusCode) {
     this.statusCode = statusCode;
     return this;
