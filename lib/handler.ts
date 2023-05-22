@@ -38,10 +38,6 @@ export class Handler<C extends Context> {
     return this;
   }
 
-  private toJson(body: unknown, init?: ResponseInit) {
-    return NextResponse.json(body, init);
-  }
-
   handle(handler: ContextHandler<C, unknown>) {
     return async (request: NextRequest) => {
       const context = new Context(request) as C;
