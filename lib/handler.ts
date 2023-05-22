@@ -13,7 +13,7 @@ export class Handler<C extends Context> {
 
   private beforeHandlers: ContextHandler<C, unknown>[] = [];
 
-  private afterHandlers: ContextHandler<C, unknown>[] = [];
+  private afterHandlers: ((context: C, result: unknown) => unknown)[] = [];
 
   private beforeErrorHandlers: ((context: C, e: unknown) => unknown)[] = [];
 
@@ -81,7 +81,7 @@ export class Handler<C extends Context> {
           result = await result;
         }
 
-        await this.executeAfterHandlers(context);
+        await this.executeAfterHandlers(context, result);
 
         if (this.returnJson) {
           return NextResponse.json(result, {
@@ -111,7 +111,7 @@ export class Handler<C extends Context> {
     return this;
   }
 
-  useAfterHandlers(...handlers: ContextHandler<C, unknown>[]) {
+  useAfterHandlers(...handlers: ((context: C, result: unknown) => unknown)[]) {
     this.afterHandlers.push(...handlers);
     return this;
   }
@@ -162,13 +162,13 @@ export class Handler<C extends Context> {
     }
   }
 
-  async executeAfterHandlers(context: C) {
+  async executeAfterHandlers<T>(context: C, result: T) {
     if (!this.afterHandlers.length) {
       return;
     }
 
     for (const handler of this.afterHandlers) {
-      const resultAfterHandler = handler.call(this, context);
+      const resultAfterHandler = handler.call(this, context, result);
 
       if (resultAfterHandler instanceof Promise) {
         await resultAfterHandler;
