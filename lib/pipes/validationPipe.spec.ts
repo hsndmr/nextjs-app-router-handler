@@ -3,13 +3,10 @@ import { validationPipe } from './validationPipe';
 import { HttpStatusCode } from '../http-exceptions';
 
 class Dto {
-  // @ts-ignore
   @IsNotEmpty()
-  // @ts-ignore
   @IsEmail()
   email: string;
 
-  // @ts-ignore
   @IsNotEmpty()
   name: string;
 }
