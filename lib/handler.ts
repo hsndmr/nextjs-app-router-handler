@@ -21,9 +21,6 @@ export class Handler<C extends Context> {
 
   private statusCode: HttpStatusCode = HttpStatusCode.OK;
 
-  // @ts-ignore
-  private handler: ContextHandler<C, unknown>;
-
   constructor() {}
 
   status(statusCode: HttpStatusCode) {
@@ -46,8 +43,61 @@ export class Handler<C extends Context> {
   }
 
   handle(handler: ContextHandler<C, unknown>) {
-    this.handler = handler;
-    return this;
+    return async (request: NextRequest) => {
+      const context = new Context(request) as C;
+      try {
+        await this.executeBeforeHandlers(context);
+
+        for (const middleware of this.middlewares) {
+          let resultMiddleware = middleware.call(this, context);
+
+          if (resultMiddleware instanceof Promise) {
+            resultMiddleware = await resultMiddleware;
+          }
+
+          if (resultMiddleware) {
+            return resultMiddleware;
+          }
+        }
+
+        for (const guard of this.guards) {
+          let resultGuard = guard.call(this, context);
+
+          if (resultGuard instanceof Promise) {
+            resultGuard = await resultGuard;
+          }
+
+          if (!resultGuard) {
+            return NextResponse.json(
+              {},
+              {
+                status: HttpStatusCode.FORBIDDEN,
+              },
+            );
+          }
+        }
+
+        await this.executePipes(context);
+
+        let result = handler.call(this, context);
+
+        if (result instanceof Promise) {
+          result = await result;
+        }
+
+        await this.executeAfterHandlers(context);
+
+        if (this.returnJson) {
+          return NextResponse.json(result, {
+            status: this.statusCode,
+          });
+        }
+
+        return result;
+      } catch (e: unknown) {
+        return this.handleError(e, context);
+      }
+    };
   }
 
   usePipes(...pipes: ContextHandler<C, void>[]) {
@@ -152,65 +202,5 @@ export class Handler<C extends Context> {
         await resultPipe;
       }
     }
-  }
-
-  create() {
-    return (request: NextRequest) => {
-      return (async () => {
-        const context = new Context(request) as C;
-        try {
-          await this.executeBeforeHandlers(context);
-
-          for (const middleware of this.middlewares) {
-            let resultMiddleware = middleware.call(this, context);
-
-            if (resultMiddleware instanceof Promise) {
-              resultMiddleware = await resultMiddleware;
-            }
-
-            if (resultMiddleware) {
-              return resultMiddleware;
-            }
-          }
-
-          for (const guard of this.guards) {
-            let resultGuard = guard.call(this, context);
-
-            if (resultGuard instanceof Promise) {
-              resultGuard = await resultGuard;
-            }
-
-            if (!resultGuard) {
-              return NextResponse.json(
-                {},
-                {
-                  status: HttpStatusCode.FORBIDDEN,
-                },
-              );
-            }
-          }
-
-          await this.executePipes(context);
-
-          let result = this.handler.call(this, context);
-
-          if (result instanceof Promise) {
-            result = await result;
-          }
-
-          await this.executeAfterHandlers(context);
-
-          if (this.returnJson) {
-            return NextResponse.json(result, {
-              status: this.statusCode,
-            });
-          }
-
-          return result;
-        } catch (e: unknown) {
-          return this.handleError(e, context);
-        }
-      })();
-    };
   }
 }

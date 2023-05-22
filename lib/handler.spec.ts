@@ -268,7 +268,7 @@ describe('Handler', () => {
     });
   });
 
-  describe('create', () => {
+  describe('handle', () => {
     it('should handle the request correctly', async () => {
       // Arrange
       const req = jest.fn();
@@ -282,12 +282,6 @@ describe('Handler', () => {
       const handler = new Handler()
         .useMiddlewares(middleware1, middleware2)
         .useGuards(guard1, guard2)
-        .handle(async context => {
-          await handlerFunction(context);
-          return {
-            message: 'Test',
-          };
-        })
         .status(HttpStatusCode.OK);
 
       (NextResponse.json as jest.Mock).mockReturnValue({
@@ -300,7 +294,12 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      const response = await handler.create()(req as any);
+      const response = await handler.handle(async context => {
+        await handlerFunction(context);
+        return {
+          message: 'Test',
+        };
+      })(req as any);
 
       // Assert
       expect(handler.executeBeforeHandlers).toHaveBeenCalledWith(context);
@@ -337,7 +336,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(() => {})(req as any);
 
       expect(handler.handleError).toHaveBeenCalledWith('error', context);
     });
@@ -356,7 +355,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(jest.fn())(req as any);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(handler.handleError).toHaveBeenCalledWith('error', context);
@@ -378,7 +377,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(jest.fn())(req as any);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -411,7 +410,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(jest.fn())(req as any);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -437,7 +436,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(jest.fn())(req as any);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -458,13 +457,12 @@ describe('Handler', () => {
         .useBeforeHandlers(beforeHandler)
         .useMiddlewares(middleware)
         .usePipes(pipe)
-        .handle(handlerFunction)
         .useGuards(guard);
 
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(handlerFunction)(req as any);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -487,14 +485,13 @@ describe('Handler', () => {
         .useBeforeHandlers(beforeHandler)
         .useMiddlewares(middleware)
         .usePipes(pipe)
-        .handle(handlerFunction)
         .useAfterHandlers(afterHandler)
         .useGuards(guard);
 
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(handlerFunction)(req as any);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -513,10 +510,10 @@ describe('Handler', () => {
         });
       };
 
-      const handler = new Handler().isReturnJson(false).handle(handlerFunction);
+      const handler = new Handler().isReturnJson(false);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(handlerFunction)(req as any);
 
       expect(NextResponse.json).toHaveBeenCalledWith({
         data: 'data',
@@ -537,7 +534,7 @@ describe('Handler', () => {
         .useMiddlewares(middleware);
 
       // Act
-      await handler.create()(req as any);
+      await handler.handle(jest.fn())(req as any);
 
       expect(NextResponse.json).toHaveBeenCalledWith({
         data: 'data',
