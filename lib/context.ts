@@ -3,8 +3,16 @@ import { NextRequest } from 'next/server';
 export class Context {
   private data: Map<string, unknown>;
 
-  constructor(public req: NextRequest) {
+  private params?: unknown;
+
+  constructor(
+    public req: NextRequest,
+    public reqContext?: {
+      params?: Record<string, any>;
+    },
+  ) {
     this.data = new Map<string, unknown>();
+    this.params = reqContext?.params;
   }
 
   set(key: string, value: unknown) {
@@ -38,5 +46,13 @@ export class Context {
 
   getUser<T>(): T | undefined {
     return this.get('user');
+  }
+
+  setParams(params: unknown) {
+    this.params = params;
+  }
+
+  getParams<T>(): T | undefined {
+    return this.params as T;
   }
 }
