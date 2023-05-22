@@ -29,9 +29,6 @@ const GET = createHandler()
   });
 
 const POST = createHandler()
-  .useMiddlewares(context => {
-    console.log('context', context.req.body);
-  })
   .usePipes(validationPipe(CreatePostDto))
   .status(HttpStatusCode.CREATED)
   .handle(context => {
