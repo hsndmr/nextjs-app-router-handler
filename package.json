@@ -1,6 +1,6 @@
 {
   "name": "nextjs-app-router-handler",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This is a simple route handler implementation for Next.js",
   "url": "https://github.com/hsndmr/nextjs-app-router-handler",
   "files": [
