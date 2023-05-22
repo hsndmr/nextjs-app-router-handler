@@ -17,5 +17,5 @@
     "strictPropertyInitialization": false
   },
   "include": ["lib/**/*"],
-  "exclude": ["node_modules", "lib/**/*.spec.ts", "example"]
+  "exclude": ["node_modules", "example"]
 }
