@@ -278,6 +278,7 @@ describe('Handler', () => {
       const middleware2 = jest.fn(() => Promise.resolve());
       const guard1 = jest.fn().mockReturnValue(true);
       const guard2 = jest.fn(() => Promise.resolve(true));
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const handlerFunction = jest.fn(_ => Promise.resolve());
 
       const handler = new Handler()
@@ -339,6 +340,8 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
+
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       await handler.handle(() => {})(req as any);
 
       expect(handler.handleError).toHaveBeenCalledWith('error', context);
@@ -399,6 +402,8 @@ describe('Handler', () => {
       const beforeHandler = jest.fn();
       const middleware = jest.fn();
       const guard1 = jest.fn().mockReturnValue(true);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const guard2Handler = jest.fn(_ => Promise.reject('error'));
       const guard2 = async (context: any) => {
         await guard2Handler(context);
