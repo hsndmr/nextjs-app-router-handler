@@ -37,8 +37,8 @@ export class Handler<C extends Context> {
   }
 
   handle(handler: ContextHandler<C, unknown>) {
-    return async (request: NextRequest) => {
-      const context = new Context(request) as C;
+    return async (request: NextRequest, requestContext: any) => {
+      const context = new Context(request, requestContext) as C;
       try {
         await this.executeBeforeHandlers(context);
 

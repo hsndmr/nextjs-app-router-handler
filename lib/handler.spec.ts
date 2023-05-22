@@ -273,7 +273,8 @@ describe('Handler', () => {
     it('should handle the request correctly', async () => {
       // Arrange
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const middleware1 = jest.fn();
       const middleware2 = jest.fn(() => Promise.resolve());
       const guard1 = jest.fn().mockReturnValue(true);
@@ -301,7 +302,7 @@ describe('Handler', () => {
         return {
           message: 'Test',
         };
-      })(req as any);
+      })(req as any, reqContext);
 
       // Assert
       expect(handler.executeBeforeHandlers).toHaveBeenCalledWith(context);
@@ -330,7 +331,8 @@ describe('Handler', () => {
 
     it('should handle the request correctly when an error is thrown by beforeHandlers', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const beforeHandler1 = jest.fn();
       const beforeHandler2 = jest.fn(() => Promise.reject('error'));
 
@@ -342,14 +344,15 @@ describe('Handler', () => {
       // Act
 
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      await handler.handle(() => {})(req as any);
+      await handler.handle(() => {})(req as any, reqContext);
 
       expect(handler.handleError).toHaveBeenCalledWith('error', context);
     });
 
     it('should handle the request correctly when an error is thrown by middlewares', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const beforeHandler = jest.fn();
       const middleware1 = jest.fn();
       const middleware2 = jest.fn(() => Promise.reject('error'));
@@ -361,7 +364,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.handle(jest.fn())(req as any);
+      await handler.handle(jest.fn())(req as any, reqContext);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(handler.handleError).toHaveBeenCalledWith('error', context);
@@ -369,7 +372,8 @@ describe('Handler', () => {
 
     it('should handle the request correctly when a guard returns false', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const beforeHandler = jest.fn();
       const middleware = jest.fn();
       const guard1 = jest.fn().mockReturnValue(true);
@@ -383,7 +387,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.handle(jest.fn())(req as any);
+      await handler.handle(jest.fn())(req as any, reqContext);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -398,7 +402,8 @@ describe('Handler', () => {
 
     it('should handle the request correctly when an error is thrown by guards', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const beforeHandler = jest.fn();
       const middleware = jest.fn();
       const guard1 = jest.fn().mockReturnValue(true);
@@ -418,7 +423,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.handle(jest.fn())(req as any);
+      await handler.handle(jest.fn())(req as any, reqContext);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -428,7 +433,8 @@ describe('Handler', () => {
 
     it('should handle the request correctly when an error is thrown by pipes', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const beforeHandler = jest.fn();
       const middleware = jest.fn();
       const guard = jest.fn().mockReturnValue(true);
@@ -444,7 +450,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.handle(jest.fn())(req as any);
+      await handler.handle(jest.fn())(req as any, reqContext);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -454,7 +460,8 @@ describe('Handler', () => {
 
     it('should handle the request correctly when an error is thrown by handler', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const beforeHandler = jest.fn();
       const middleware = jest.fn();
       const guard = jest.fn().mockReturnValue(true);
@@ -470,7 +477,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.handle(handlerFunction)(req as any);
+      await handler.handle(handlerFunction)(req as any, reqContext);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -481,7 +488,8 @@ describe('Handler', () => {
 
     it('should handle the request correctly when an error is thrown by afterHandler', async () => {
       const req = jest.fn();
-      const context = new Context(req as any);
+      const reqContext = jest.fn();
+      const context = new Context(req as any, reqContext as any);
       const beforeHandler = jest.fn();
       const middleware = jest.fn();
       const guard = jest.fn().mockReturnValue(true);
@@ -499,7 +507,7 @@ describe('Handler', () => {
       jest.spyOn(handler, 'handleError').mockResolvedValue(NextResponse as any);
 
       // Act
-      await handler.handle(handlerFunction)(req as any);
+      await handler.handle(handlerFunction)(req as any, reqContext);
 
       expect(beforeHandler).toHaveBeenCalledWith(context);
       expect(middleware).toHaveBeenCalledWith(context);
@@ -511,6 +519,7 @@ describe('Handler', () => {
 
     it('should handle the request correctly when isRequestJson is set to false', async () => {
       const req = jest.fn();
+      const reqContext = jest.fn();
       const handlerFunction = () => {
         return NextResponse.json({
           data: 'data',
@@ -520,7 +529,7 @@ describe('Handler', () => {
       const handler = new Handler().isReturnJson(false);
 
       // Act
-      await handler.handle(handlerFunction)(req as any);
+      await handler.handle(handlerFunction)(req as any, reqContext);
 
       expect(NextResponse.json).toHaveBeenCalledWith({
         data: 'data',
@@ -529,6 +538,7 @@ describe('Handler', () => {
 
     it('should handle the request correctly when a middleware returns a value', async () => {
       const req = jest.fn();
+      const reqContext = jest.fn();
       const middleware = () => {
         return NextResponse.json({
           data: 'data',
@@ -540,7 +550,7 @@ describe('Handler', () => {
         .useMiddlewares(middleware);
 
       // Act
-      await handler.handle(jest.fn())(req as any);
+      await handler.handle(jest.fn())(req as any, reqContext);
 
       expect(NextResponse.json).toHaveBeenCalledWith({
         data: 'data',
