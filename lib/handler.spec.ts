@@ -221,13 +221,14 @@ describe('Handler', () => {
       const afterHandler2 = jest.fn(() => Promise.resolve());
       handler.useAfterHandlers(afterHandler1, afterHandler2);
       const context = jest.fn();
+      const response = jest.fn();
 
       // Act
-      await handler.executeAfterHandlers(context as any);
+      await handler.executeAfterHandlers(context as any, response as any);
 
       // Assert
-      expect(afterHandler1).toHaveBeenCalledWith(context);
-      expect(afterHandler2).toHaveBeenCalledWith(context);
+      expect(afterHandler1).toHaveBeenCalledWith(context, response);
+      expect(afterHandler2).toHaveBeenCalledWith(context, response);
     });
   });
 
@@ -309,7 +310,9 @@ describe('Handler', () => {
       expect(guard2).toHaveBeenCalledWith(context);
       expect(handler.executePipes).toHaveBeenCalledWith(context);
       expect(handlerFunction).toHaveBeenCalledWith(context);
-      expect(handler.executeAfterHandlers).toHaveBeenCalledWith(context);
+      expect(handler.executeAfterHandlers).toHaveBeenCalledWith(context, {
+        message: 'Test',
+      });
       expect(NextResponse.json).toHaveBeenCalledWith(
         {
           message: 'Test',
