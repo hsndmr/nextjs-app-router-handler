@@ -11,7 +11,7 @@ export class Context {
     this.data.set(key, value);
   }
 
-  get<T>(key: string, defaultValue = undefined): T | typeof defaultValue {
+  get<T>(key: string, defaultValue: T | undefined = undefined): T | undefined {
     const value = this.data.get(key) as T;
     if (value === undefined) {
       return defaultValue;
