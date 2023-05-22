@@ -2,13 +2,11 @@ import { Handler } from 'nextjs-app-router-handler';
 import { validationPipe } from 'nextjs-app-router-handler/pipes';
 import { CreateCommentDto } from '@/lib/createCommentDto';
 
-const GET = new Handler()
-  .handle(context => {
-    return {
-      message: 'Hello World',
-    };
-  })
-  .create();
+const GET = new Handler().handle(context => {
+  return {
+    message: 'Hello World',
+  };
+});
 
 const POST = new Handler()
   .usePipes(validationPipe(CreateCommentDto))
@@ -17,7 +15,6 @@ const POST = new Handler()
     return {
       comment: body.content ?? 'no comment',
     };
-  })
-  .create();
+  });
 
 export { GET, POST };
